@@ -1,0 +1,14 @@
+subprojects {
+    group 'br.gov.rs.defensoria.dpe-gradle-plugins'
+
+    apply plugin: 'groovy'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile gradleApi()
+        compile localGroovy()
+    }
+}

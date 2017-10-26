@@ -1,0 +1,2 @@
+include 'valid-migrations-order'
+rootProject.name = 'dpe-gradle-plugins'
