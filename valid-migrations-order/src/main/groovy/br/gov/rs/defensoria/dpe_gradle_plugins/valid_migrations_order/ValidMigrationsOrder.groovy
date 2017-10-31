@@ -2,6 +2,7 @@ package br.gov.rs.defensoria.dpe_gradle_plugins.valid_migrations_order
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.apache.commons.lang.SystemUtils
 
 class ValidMigrationsOrder implements Plugin<Project> {
     void apply(Project project) {
@@ -11,7 +12,7 @@ class ValidMigrationsOrder implements Plugin<Project> {
         }
 
         project.task('isValidMigrationsOrder') {
-            description 'Valida se a os arquivos de migrations incluidos/alterados pelo ultimo commit sao os ultimos na ordem do repositorio'
+            description 'Valida se os arquivos de migrations incluídos/alterados pelo último commit são os últimos na ordem do repositório'
 
             def extension = project.extensions.create('valid_migrations_order', PluginExtension)
 
@@ -21,7 +22,7 @@ class ValidMigrationsOrder implements Plugin<Project> {
 
                 assert extension.migrationsFolderPath != "": "É necessário informar o diretório raiz das migrations"
 
-                validadeFolder(project.file(extension.migrationsFolderPath as String))
+                validateFolder(project.file(extension.migrationsFolderPath as String))
 
                 println '--Migrations validadas com sucesso--'
             }
@@ -35,9 +36,9 @@ class ValidMigrationsOrder implements Plugin<Project> {
         for (File subFile : rootFolder.listFiles()) {
 
             if (subFile.isDirectory()) {
-                validadeFolder(subFile)
+                validateFolder(subFile)
             } else {
-                validadeFileOrder(subFile.getParentFile())
+                validateFileOrder(subFile.getParentFile())
                 return
             }
 
@@ -49,10 +50,11 @@ class ValidMigrationsOrder implements Plugin<Project> {
         println 'Validando: ' + rootFolder.path
 
         def migrationsNoDiretorio = rootFolder.listFiles()
+        Arrays.sort(migrationsNoDiretorio)
         def newMigrations = "git diff HEAD^  HEAD --name-only $rootFolder.path".execute().text
 
-        def totalNewMigrations = newMigrations.readLines().size()
-        def totalMigrations = migrationsNoDiretorio.size()
+        int totalNewMigrations = newMigrations.readLines().size()
+        int totalMigrations = migrationsNoDiretorio.size()
 
         newMigrations.eachLine { line, count ->
             def correctMigrationPosition = totalMigrations - (totalNewMigrations - count)
